@@ -21,6 +21,8 @@ alias - /b
 
 > builder.name - Allow floating player names
 
+> builder.unrestricted = ignore limitations 
+
 **/checkbuilder <playername>** - Check if player is in builder mode or not
 alias - /cb <playername>
 > Permission: builder.check
