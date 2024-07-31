@@ -21,7 +21,7 @@ namespace Tortellio.BuilderMode
             Logger.Log(PluginName + PluginVersion, ConsoleColor.Yellow);
             Logger.Log("Made by Tortellio", ConsoleColor.Yellow);
             BarricadeManager.onTransformRequested += HandleBarricadeTransform;
-			StructureManager.onTransformRequested += HandleStructureTransform;
+            StructureManager.onTransformRequested += HandleStructureTransform;
         }
         protected override void Unload()
         {
@@ -29,7 +29,7 @@ namespace Tortellio.BuilderMode
             Logger.Log("BuilderMode has been unloaded!");
             Logger.Log("Visit Tortellio Discord for more! https://discord.gg/pzQwsew", ConsoleColor.Yellow);
             BarricadeManager.onTransformRequested -= HandleBarricadeTransform;
-			StructureManager.onTransformRequested -= HandleStructureTransform;
+            StructureManager.onTransformRequested -= HandleStructureTransform;
         }
 		private void HandleStructureTransform(CSteamID instigator, byte x, byte y, uint instanceID, ref Vector3 point, ref byte angle_x, ref byte angle_y, ref byte angle_z, ref bool shouldAllow)
 		{
