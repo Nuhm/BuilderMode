@@ -12,7 +12,7 @@ namespace Tortellio.BuilderMode
         public void LoadDefaults()
         {
             EnableServerAnnouncer = true;
-            RestrictiveDistance = 15f;
+            RestrictiveDistance = 50f;
             MinY = -20f;
             MaxY = 400f;
             MessageColor = "Yellow";
