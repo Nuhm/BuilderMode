@@ -3,6 +3,8 @@ using Rocket.API.Collections;
 using Rocket.Core.Plugins;
 using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
+using SDG.Unturned;
+using Steamworks;
 using System;
 using UnityEngine;
 using Logger = Rocket.Core.Logging.Logger;
@@ -42,7 +44,7 @@ namespace Tortellio.BuilderMode
 					if (structureDrop != null)
 					{
 						StructureData serversideData = structureDrop.GetServersideData();
-						if (instigator.m_SteamID != serversideData.owner)
+						if (instigator.m_SteamID != serversideData.owner || Vector3.Distance(player.Position, serversideData.point) > Configuration.Instance.RestrictiveDistance || serversideData.point.y < Configuration.Instance.MinY || serversideData.point.y > Configuration.Instance.MaxY)
 						{
 							if (!player.HasPermission("builder.unrestricted"))
 							{
@@ -65,7 +67,7 @@ namespace Tortellio.BuilderMode
 					if (barricadeDrop != null)
 					{
 						BarricadeData serversideData = barricadeDrop.GetServersideData();
-						if (instigator.m_SteamID != serversideData.owner)
+						if (instigator.m_SteamID != serversideData.owner || Vector3.Distance(player.Position, serversideData.point) > Configuration.Instance.RestrictiveDistance || serversideData.point.y < Configuration.Instance.MinY || serversideData.point.y > Configuration.Instance.MaxY)
 						{
 							if (!player.HasPermission("builder.unrestricted"))
 							{
