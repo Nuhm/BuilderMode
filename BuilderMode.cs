@@ -15,7 +15,7 @@ namespace Tortellio.BuilderMode
     {
         public static BuilderMode Instance;
         public static string PluginName = "BuilderMode";
-        public static string PluginVersion = " 1.0.1";
+        public static string PluginVersion = " 1.0.2";
         protected override void Load()
         {
             Instance = this;
