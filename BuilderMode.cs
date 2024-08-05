@@ -19,43 +19,45 @@ namespace Tortellio.BuilderMode
         protected override void Load()
         {
             Instance = this;
+            BarricadeManager.onTransformRequested += HandleBarricadeTransform;
+            StructureManager.onTransformRequested += HandleStructureTransform;
             Logger.Log("BuilderMode has been loaded!");
             Logger.Log(PluginName + PluginVersion, ConsoleColor.Yellow);
             Logger.Log("Made by Tortellio", ConsoleColor.Yellow);
-            BarricadeManager.onTransformRequested += HandleBarricadeTransform;
-            StructureManager.onTransformRequested += HandleStructureTransform;
         }
         protected override void Unload()
         {
             Instance = null;
-            Logger.Log("BuilderMode has been unloaded!");
-            Logger.Log("Visit Tortellio Discord for more! https://discord.gg/pzQwsew", ConsoleColor.Yellow);
             BarricadeManager.onTransformRequested -= HandleBarricadeTransform;
             StructureManager.onTransformRequested -= HandleStructureTransform;
+            Logger.Log("BuilderMode has been unloaded!");
+            Logger.Log("Visit Tortellio Discord for more! https://discord.gg/pzQwsew", ConsoleColor.Yellow);
         }
-		private void HandleStructureTransform(CSteamID instigator, byte x, byte y, uint instanceID, ref Vector3 point, ref byte angle_x, ref byte angle_y, ref byte angle_z, ref bool shouldAllow)
-		{
-			if (instigator != CSteamID.Nil)
-			{
-				UnturnedPlayer player = UnturnedPlayer.FromCSteamID(instigator);
-				if (StructureManager.tryGetRegion(x, y, out StructureRegion structureRegion))
-				{
-					StructureDrop structureDrop = structureRegion.drops.Find((StructureDrop o) => o.instanceID == instanceID);
-					if (structureDrop != null)
-					{
-						StructureData serversideData = structureDrop.GetServersideData();
-						if (instigator.m_SteamID != serversideData.owner || Vector3.Distance(player.Position, serversideData.point) > Configuration.Instance.RestrictiveDistance || serversideData.point.y < Configuration.Instance.MinY || serversideData.point.y > Configuration.Instance.MaxY)
-						{
-							if (!player.HasPermission("builder.unrestricted"))
-							{
-								shouldAllow = false;
-								UnturnedChat.Say(player, BuilderMode.Instance.Translate("no_permission_restricted"));
-							}
-						}
-					}
-				}
-			}
-		}
+        private void HandleStructureTransform(CSteamID instigator, byte x, byte y, uint instanceID, ref Vector3 point, ref byte angle_x, ref byte angle_y, ref byte angle_z, ref bool shouldAllow)
+        {
+            if (instigator != CSteamID.Nil)
+            {
+                UnturnedPlayer player = UnturnedPlayer.FromCSteamID(instigator);
+                if (StructureManager.tryGetRegion(x, y, out StructureRegion structureRegion))
+                {
+                    StructureDrop structureDrop = structureRegion.drops.Find((StructureDrop o) => o.instanceID == instanceID);
+                    if (structureDrop != null)
+                    {
+                        StructureData serversideData = structureDrop.GetServersideData();
+                        if (instigator.m_SteamID != serversideData.owner || Vector3.Distance(player.Position, serversideData.point) > Configuration.Instance.RestrictiveDistance || serversideData.point.y < Configuration.Instance.MinY || serversideData.point.y > Configuration.Instance.MaxY)
+                        {
+                            if (!player.HasPermission("builder.unrestricted"))
+                            {
+                                shouldAllow = false;
+                                UnturnedChat.Say(player, BuilderMode.Instance.Translate("no_permission_restricted"));
+                                return;
+                            }
+                            if(Configuration.Instance.DiscordWebHook!="")SendDiscordWebhook(Configuration.Instance.DiscordWebHook, Configuration.Instance.DiscordWebHookIcon, Configuration.Instance.DiscordWebHookName, "[" + player.DisplayName + "](<https://steamcommunity.com/profiles/" + player.CSteamID.m_SteamID.ToString() + ">) modified structure `" + serversideData.structure.asset.FriendlyName + "` at " + serversideData.point.x + "," + serversideData.point.y + "," + serversideData.point.z);
+                        }
+                    }
+                }
+            }
+        }
   		private void HandleBarricadeTransform(CSteamID instigator, byte x, byte y, ushort plant, uint instanceID, ref Vector3 point, ref byte angle_x, ref byte angle_y, ref byte angle_z, ref bool shouldAllow)
 		{
 			if (instigator != CSteamID.Nil)
@@ -73,7 +75,9 @@ namespace Tortellio.BuilderMode
 							{
 								shouldAllow = false;
 								UnturnedChat.Say(player, BuilderMode.Instance.Translate("no_permission_restricted"));
+                                return;
 							}
+                            if (Configuration.Instance.DiscordWebHook != "") SendDiscordWebhook(Configuration.Instance.DiscordWebHook, Configuration.Instance.DiscordWebHookIcon, Configuration.Instance.DiscordWebHookName, "["+player.DisplayName+"](<https://steamcommunity.com/profiles/"+player.CSteamID.m_SteamID.ToString()+">) modified barricade `"+serversideData.barricade.asset.FriendlyName+"` at "+serversideData.point.x + "," + serversideData.point.y + "," + serversideData.point.z);
 						}
 					}
 				}
@@ -109,6 +113,22 @@ namespace Tortellio.BuilderMode
                 UnturnedChat.Say(caller, Translate("cb_not_found"));
                 return;
             }
+        }
+
+        public static async void SendDiscordWebhook(string URL, string icon, string username, string message)
+        {
+            await System.Threading.Tasks.Task.Run(() =>
+            {
+                try
+                {
+                    System.Collections.Specialized.NameValueCollection discordValues = new System.Collections.Specialized.NameValueCollection();
+                    if(username!="") discordValues.Add("username", username);
+                    if(icon!="") discordValues.Add("avatar_url", icon);
+                    discordValues.Add("content", message);
+                    new System.Net.WebClient().UploadValues(URL, discordValues);
+                }
+                catch (System.Exception) { }
+            });
         }
 
         public override TranslationList DefaultTranslations => new TranslationList()
