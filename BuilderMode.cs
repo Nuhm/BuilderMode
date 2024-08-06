@@ -127,8 +127,8 @@ namespace Tortellio.BuilderMode
                     discordValues.Add("content", message);
                     new System.Net.WebClient().UploadValues(URL, discordValues);
                 }
-                catch (System.Exception e) {
-                    Logger.LogException(e);
+                catch (System.Exception) {
+                    Logger.Log(message);
                 }
             });
         }
