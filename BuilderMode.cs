@@ -52,8 +52,8 @@ namespace Tortellio.BuilderMode
                                 UnturnedChat.Say(player, BuilderMode.Instance.Translate("no_permission_restricted"));
                                 return;
                             }
-                            if(Configuration.Instance.DiscordWebHook!="")SendDiscordWebhook(Configuration.Instance.DiscordWebHook, Configuration.Instance.DiscordWebHookIcon, Configuration.Instance.DiscordWebHookName, "[" + player.DisplayName + "](<https://steamcommunity.com/profiles/" + player.CSteamID.m_SteamID.ToString() + ">) modified structure `" + serversideData.structure.asset.FriendlyName + "` at " + serversideData.point.x + "," + serversideData.point.y + "," + serversideData.point.z);
                         }
+                        if (Configuration.Instance.DiscordWebHook != "") SendDiscordWebhook(Configuration.Instance.DiscordWebHook, Configuration.Instance.DiscordWebHookIcon, Configuration.Instance.DiscordWebHookName, "[" + player.DisplayName + "](<https://steamcommunity.com/profiles/" + player.CSteamID.m_SteamID.ToString() + ">) modified structure `" + serversideData.structure.asset.FriendlyName + "` at " + serversideData.point.x + "," + serversideData.point.y + "," + serversideData.point.z);
                     }
                 }
             }
@@ -77,9 +77,9 @@ namespace Tortellio.BuilderMode
 								UnturnedChat.Say(player, BuilderMode.Instance.Translate("no_permission_restricted"));
                                 return;
 							}
-                            if (Configuration.Instance.DiscordWebHook != "") SendDiscordWebhook(Configuration.Instance.DiscordWebHook, Configuration.Instance.DiscordWebHookIcon, Configuration.Instance.DiscordWebHookName, "["+player.DisplayName+"](<https://steamcommunity.com/profiles/"+player.CSteamID.m_SteamID.ToString()+">) modified barricade `"+serversideData.barricade.asset.FriendlyName+"` at "+serversideData.point.x + "," + serversideData.point.y + "," + serversideData.point.z);
 						}
-					}
+                        if (Configuration.Instance.DiscordWebHook != "") SendDiscordWebhook(Configuration.Instance.DiscordWebHook, Configuration.Instance.DiscordWebHookIcon, Configuration.Instance.DiscordWebHookName, "[" + player.DisplayName + "](<https://steamcommunity.com/profiles/" + player.CSteamID.m_SteamID.ToString() + ">) modified barricade `" + serversideData.barricade.asset.FriendlyName + "` at " + serversideData.point.x + "," + serversideData.point.y + "," + serversideData.point.z);
+                    }
 				}
 			}
 		}
@@ -127,7 +127,9 @@ namespace Tortellio.BuilderMode
                     discordValues.Add("content", message);
                     new System.Net.WebClient().UploadValues(URL, discordValues);
                 }
-                catch (System.Exception) { }
+                catch (System.Exception e) {
+                    Logger.LogException(e);
+                }
             });
         }
 

@@ -19,7 +19,7 @@ namespace Tortellio.BuilderMode
             MinY = -20f;
             MaxY = 400f;
             MessageColor = "Yellow";
-            DiscordWebHook = "https://canary.discord.com/api/webhooks/111/11";
+            DiscordWebHook = "";
             DiscordWebHookIcon = "https://cdn.discordapp.com/avatars/807474843469611059/a_d5c8540bda187272055cee53219e99d3.gif?size=1024";
             DiscordWebHookName = "BuilderMode";
         }
