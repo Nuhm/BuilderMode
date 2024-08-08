@@ -15,7 +15,7 @@ namespace Tortellio.BuilderMode
     {
         public static BuilderMode Instance;
         public static string PluginName = "BuilderMode";
-        public static string PluginVersion = " 1.0.2";
+        public static string PluginVersion = " 1.0.6";
         protected override void Load()
         {
             Instance = this;
@@ -40,7 +40,7 @@ namespace Tortellio.BuilderMode
                 UnturnedPlayer player = UnturnedPlayer.FromCSteamID(instigator);
                 if (StructureManager.tryGetRegion(x, y, out StructureRegion structureRegion))
                 {
-                    StructureDrop structureDrop = structureRegion.drops.Find((StructureDrop o) => o.instanceID == instanceID);
+                    StructureDrop structureDrop = structureRegion.drops.Find(o => o.instanceID == instanceID);
                     if (structureDrop != null)
                     {
                         StructureData serversideData = structureDrop.GetServersideData();
@@ -49,7 +49,7 @@ namespace Tortellio.BuilderMode
                             if (!player.HasPermission("builder.unrestricted"))
                             {
                                 shouldAllow = false;
-                                UnturnedChat.Say(player, BuilderMode.Instance.Translate("no_permission_restricted"));
+                                UnturnedChat.Say(player, Instance.Translate("no_permission_restricted"));
                                 return;
                             }
                         }
@@ -65,16 +65,25 @@ namespace Tortellio.BuilderMode
 				UnturnedPlayer player = UnturnedPlayer.FromCSteamID(instigator);
 				if (BarricadeManager.tryGetRegion(x, y, plant, out BarricadeRegion barricadeRegion))
 				{
-					BarricadeDrop barricadeDrop = barricadeRegion.drops.Find((BarricadeDrop o) => o.instanceID == instanceID);
+					BarricadeDrop barricadeDrop = barricadeRegion.drops.Find(o => o.instanceID == instanceID);
 					if (barricadeDrop != null)
 					{
 						BarricadeData serversideData = barricadeDrop.GetServersideData();
+                        ushort barricadeId = serversideData.barricade.asset.id;
+                        
+                        if (Configuration.Instance.BlacklistedBarricades.Contains(barricadeId))
+                        {
+                            shouldAllow = false;
+                            UnturnedChat.Say(player, Instance.Translate("barricade_blacklisted", serversideData.barricade.asset.FriendlyName), Color.red);
+                            return;
+                        }
+                        
 						if (instigator.m_SteamID != serversideData.owner || Vector3.Distance(player.Position, serversideData.point) > Configuration.Instance.RestrictiveDistance || serversideData.point.y < Configuration.Instance.MinY || serversideData.point.y > Configuration.Instance.MaxY)
 						{
 							if (!player.HasPermission("builder.unrestricted"))
 							{
 								shouldAllow = false;
-								UnturnedChat.Say(player, BuilderMode.Instance.Translate("no_permission_restricted"));
+								UnturnedChat.Say(player, Instance.Translate("no_permission_restricted"));
                                 return;
 							}
 						}
@@ -102,16 +111,15 @@ namespace Tortellio.BuilderMode
         }
         public void CheckBuilder(UnturnedPlayer cplayer, IRocketPlayer caller)
         {
-            UnturnedPlayer player = (UnturnedPlayer)caller;
             if (cplayer != null && (cplayer.Player.look.canUseWorkzone || cplayer.Player.look.canUseFreecam || cplayer.Player.look.canUseSpecStats))
             {
                 UnturnedChat.Say(Instance.Translate("cb_on_message", caller is ConsolePlayer ? "Console" : caller.DisplayName, cplayer.DisplayName));
                 return;
             }
-            else if (cplayer == null)
+
+            if (cplayer == null)
             {
                 UnturnedChat.Say(caller, Translate("cb_not_found"));
-                return;
             }
         }
 
@@ -127,7 +135,7 @@ namespace Tortellio.BuilderMode
                     discordValues.Add("content", message);
                     new System.Net.WebClient().UploadValues(URL, discordValues);
                 }
-                catch (System.Exception) {
+                catch (Exception) {
                     Logger.Log(message);
                 }
             });
@@ -136,7 +144,7 @@ namespace Tortellio.BuilderMode
         public override TranslationList DefaultTranslations => new TranslationList()
         {
             { "b_on_message", "{0} entered builder mode." },
-            { "b_off_message", "{0} exit builder mode." },
+            { "b_off_message", "{0} left builder mode." },
             { "cb_on_message", "{0} has confirmed that {1} has builder role." },
             { "cb_off_message", "{0} has confirmed that {1} doesn't have builder role." },
             { "cb_not_found", "Player is not online or invalid." },
@@ -145,6 +153,7 @@ namespace Tortellio.BuilderMode
             { "has_builder", "Builder enabled!" },
             { "has_name", "Player Names enabled!" },
             { "no_permission", "You do not have the correct permissions to use /builder!" },
+            { "barricade_blacklisted",  "You cannot edit {0} as it is blacklisted!" }
         };
     }
 }

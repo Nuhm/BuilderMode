@@ -1,4 +1,5 @@
-﻿using Rocket.API;
+﻿using System.Collections.Generic;
+using Rocket.API;
 
 namespace Tortellio.BuilderMode
 {
@@ -12,6 +13,7 @@ namespace Tortellio.BuilderMode
         public string DiscordWebHook;
         public string DiscordWebHookIcon;
         public string DiscordWebHookName;
+        public List<ushort> BlacklistedBarricades { get; set; }
         public void LoadDefaults()
         {
             EnableServerAnnouncer = true;
@@ -22,6 +24,7 @@ namespace Tortellio.BuilderMode
             DiscordWebHook = "";
             DiscordWebHookIcon = "https://cdn.discordapp.com/avatars/807474843469611059/a_d5c8540bda187272055cee53219e99d3.gif?size=1024";
             DiscordWebHookName = "BuilderMode";
+            BlacklistedBarricades = new List<ushort> { 1234, 5678 };
         }
     }
 }
